@@ -12,7 +12,7 @@ urls = [
 
 class RadioPlayerApp(App):
 
-    CSS_PATH = "App.tcss"
+    CSS_PATH = "App.css"
     
     def compose(self) -> ComposeResult:
         yield Label(open(os.path.join(os.path.dirname(__file__), "radioplayer_ascii.txt"), "r").read(), id="Title") # Load ASCII art from file
