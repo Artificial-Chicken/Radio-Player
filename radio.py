@@ -2,7 +2,7 @@ from mpv import MPV
 import os
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, VerticalScroll
-from textual.widgets import Label, RadioSet, RadioButton
+from textual.widgets import Label, RadioSet, RadioButton, Footer
 
 urls = [
     'https://www.youtube.com/watch?v=jfKfPfyJRdk',  # Lofi Hip Hop
@@ -14,8 +14,12 @@ class RadioPlayerApp(App):
 
     CSS_PATH = "App.css"
     
+    BINDINGS = [
+        ("q", "quit", "Quit"),
+    ]
     def compose(self) -> ComposeResult:
         yield Label(open(os.path.join(os.path.dirname(__file__), "radioplayer_ascii.txt"), "r").read(), id="Title") # Load ASCII art from file
+        yield Footer()
         with VerticalScroll():
             with Horizontal():
                     with RadioSet():
@@ -27,6 +31,9 @@ class RadioPlayerApp(App):
             with Horizontal():
                 yield Label(id="index")
 
+    def action_quit(self):
+        return super().action_quit()
+    
     def on_mount(self) -> None:
         # create a single player for the app and reuse it
         self.radio = RadioPlayer()
