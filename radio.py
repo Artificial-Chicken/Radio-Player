@@ -1,9 +1,11 @@
-from mpv import MPV
 import os
+import threading
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, VerticalScroll
 from textual.widgets import Label, RadioSet, RadioButton, Footer, Sparkline
 import subprocess
+import sys
+import signal
 
 
 urls = [
@@ -56,6 +58,7 @@ class RadioPlayerApp(App):
         yield Footer()
 
     def action_quit(self):
+        RadioPlayer.stop(self.radio)
         return super().action_quit()
 
     def on_mount(self) -> None:
@@ -70,47 +73,60 @@ class RadioPlayerApp(App):
     def on_radio_set_changed(self, event):
         self.radio.stop()
         self.radio.play(urls[int(event.pressed.id[-1])])
-        self.radio.get_loudness(urls[int(event.pressed.id[-1])])
 
 
 class RadioPlayer:
-    _instances = []
-
     def __init__(self):
-        self.player = MPV(ytdl=True, vo='null', volume=50)
-        RadioPlayer._instances.append(self)
+        self.process = None
 
-    @classmethod
-    def stop_all(cls):
-        for inst in list(cls._instances):
-            try:
-                inst.player.stop()
-                if hasattr(inst.player, "terminate"):
-                    inst.player.terminate()
-            except Exception:
-                pass
-        cls._instances.clear()
+    def play(self, url: str):
+        self.stop()  # Stop any current track
 
-    def play(self, url):
-        self.player.play(url)
-        print("Playing radio stream...")
+        # Command to extract audio and pipe to ffplay
+        command = [
+            "yt-dlp",
+            "-x",                 # Extract audio
+            "--audio-format", "mp3",
+            "-o", "-",             # Output to stdout
+            url
+        ]
+
+        ffplay_command = [
+            "ffplay",
+            "-nodisp",            # No video display
+            "-autoexit",          # Exit when done
+            "-i", "pipe:0",       # Read from stdin
+            "-loglevel", "quiet"  # Suppress ffplay messages
+        ]
+
+        # Start yt-dlp process
+        yt_process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL
+        )
+
+        # Start ffplay process reading from yt-dlp stdout
+        self.process = subprocess.Popen(
+            ffplay_command,
+            stdin=yt_process.stdout,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+
+        # Detach stdout so yt-dlp closes when ffplay exits
+        yt_process.stdout.close()
+
 
     def stop(self):
-        try:
-            self.player.stop()
-        except Exception:
-            pass
-
-    def set_volume(self, vol):
-        self.player.volume = vol
-
-    def change_volume(self, delta):
-        self.player.volume += delta
-
-    def get_loudness(self, input_stream):
-        pass
-
+        if self.process:
+            try:
+                self.process.send_signal(signal.SIGTERM)
+                self.process.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+            self.process = None
 
 if __name__ == "__main__":
     app = RadioPlayerApp()
-    app.run()
+    app.run()#
