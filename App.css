@@ -1,17 +1,34 @@
 Screen {
-    layout: grid;
-    grid-size: 2;
-    grid-gutter: 2;
+    layout: vertical;
     padding: 2;
 }
+
 #Title {
     width: 100%;
-    height: 100%;
-    column-span: 2;
     content-align: center top;
     text-style: bold;
+    margin-bottom: 1;
 }
 
+/* Zeile direkt unter der ASCII-Art */
+#top_row {
+    layout: horizontal;
+    width: 100%;
+    height: auto;
+}
+
+#radio_set {
+    width: 50%;
+    content-align: left top;
+}
+
+#spark {
+    width: 50%;
+    content-align: center top;
+    padding-left: 1;
+}
+
+/* Buttons (falls vorhanden) */
 Button {
     width: 100%;
 }
