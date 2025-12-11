@@ -1,34 +1,124 @@
+/* --- THEME VARIABLES --- */
+$neon-blue: #00e5ff;
+$dark-blue: #003344;
+$bg-color: #111;
+
 Screen {
-    layout: vertical;
-    padding: 2;
+    background: $bg-color;
+    align: center middle; 
 }
 
+#main_container {
+    width: 84; 
+    height: auto;
+    align: center middle;
+}
+
+/* --- TITLE --- */
 #Title {
     width: 100%;
-    content-align: center top;
+    content-align: center middle;
+    color: $neon-blue;
     text-style: bold;
     margin-bottom: 1;
 }
 
-/* Zeile direkt unter der ASCII-Art */
-#top_row {
-    layout: horizontal;
+/* --- ROWS --- */
+Horizontal.row {
     width: 100%;
     height: auto;
+    align: center top; 
+    margin-bottom: 0;
 }
 
-#radio_set {
-    width: 50%;
-    content-align: left top;
+/* --- BOX STYLES --- */
+.box {
+    width: 1fr;
+    height: 13; /* Increased height to prevent scrollbar issues */
+    border: round $neon-blue;
+    background: $bg-color;
+    padding: 1 2;
+    margin: 0 1 1 1; 
 }
 
-#spark {
-    width: 50%;
-    content-align: center top;
-    padding-left: 1;
-}
-
-/* Buttons (falls vorhanden) */
-Button {
+.box-label {
     width: 100%;
+    text-align: center;
+    color: $neon-blue 60%;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+/* --- WIDGET SPECIFICS --- */
+
+Center {
+    width: 100%;
+    align: center middle;
+}
+
+/* Radio Set */
+RadioSet {
+    width: 100%;
+    border: none; 
+    background: $bg-color;
+    overflow: hidden; /* Ensures no scrollbar shifts content */
+}
+
+RadioButton {
+    width: 100%;
+    /* 
+       Aligning LEFT keeps the buttons in a perfect vertical line.
+       Padding-left pushes them to the visual center of the box.
+       This looks cleaner than 'center middle' for lists.
+    */
+    content-align: left middle; 
+    padding-left: 10; 
+    
+    color: white;
+    background: $bg-color;
+    height: auto;
+    margin-bottom: 1; /* Slight spacing between options */
+}
+
+RadioButton.-on {
+    color: $bg-color;
+    background: $neon-blue;
+    text-style: bold;
+}
+
+/* Sparkline */
+#spark {
+    width: 100%;
+    height: 5;
+    color: $neon-blue;
+    margin-top: 1;
+}
+
+/* Slider */
+#volume_slider {
+    width: 100%;
+    color: $neon-blue;
+    background: $bg-color;
+    margin-top: 1;
+}
+
+/* Button */
+Button {
+    min-width: 16;
+    border: none;
+    background: $dark-blue;
+    color: $neon-blue;
+    text-style: bold;
+    margin-top: 1;
+}
+
+Button:hover {
+    background: $neon-blue;
+    color: $bg-color;
+}
+
+/* Footer */
+Footer {
+    background: $dark-blue;
+    color: $neon-blue;
 }
