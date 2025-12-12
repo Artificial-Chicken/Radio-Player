@@ -34,7 +34,7 @@ Horizontal.row {
 /* --- BOX STYLES --- */
 .box {
     width: 1fr;
-    height: 13; /* Increased height to prevent scrollbar issues */
+    height: 13; /* Increased height to prevent scrollbar */
     border: round $neon-blue;
     background: $bg-color;
     padding: 1 2;
@@ -59,9 +59,10 @@ Center {
 /* Radio Set */
 RadioSet {
     width: 100%;
+    height: 80%;
     border: none; 
     background: $bg-color;
-    overflow: hidden; /* Ensures no scrollbar shifts content */
+    overflow: auto;
 }
 
 RadioButton {
@@ -110,6 +111,7 @@ Button {
     color: $neon-blue;
     text-style: bold;
     margin-top: 1;
+    height: 1;
 }
 
 Button:hover {
@@ -121,4 +123,15 @@ Button:hover {
 Footer {
     background: $dark-blue;
     color: $neon-blue;
+}
+
+#add_station_box {
+    height: 15;
+    align: center middle;
+}
+
+#add_button {
+    width: auto;
+    align: center middle;
+    margin-top: 1;
 }

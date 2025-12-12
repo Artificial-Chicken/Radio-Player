@@ -2,7 +2,7 @@ from mpv import MPV
 import os
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, Container, Center
-from textual.widgets import Label, RadioSet, RadioButton, Footer, Sparkline, Button, Input
+from textual.widgets import Label, RadioSet, RadioButton, Footer, Sparkline, Button, Input, Collapsible, Checkbox
 import time
 import threading
 import random
@@ -10,16 +10,13 @@ import math
 from textual_slider import Slider
 import json
 
+data = []
 
-import json
-data =[]
-
-import json
-
-with open("urls.json", "r") as f:
+urls_file = os.path.join(os.path.dirname(__file__), "urls.json")
+with open(urls_file, "r") as f:
     urls = json.load(f)
 
-# items is now a list of dicts
+# urls is now a list of dicts
 
 
 print(urls)
@@ -85,10 +82,24 @@ class RadioPlayerApp(App):
 
             # Row 3: Add playlist items
             with Horizontal(classes="row"):
-                yield Button("Add", id= "add_button")
-                yield Input(id="name_input", placeholder="Enter station name here")
-                yield Input(id="url_input", placeholder="Enter stream URL here")
+                with Vertical(classes="box", id="add_station_box"):
+                    yield Label("ADD STATION", classes="box-label")
+                    yield Input(id="name_input", placeholder="Enter station name here")
+                    yield Input(id="url_input", placeholder="Enter stream URL here")
+                    with Center():
+                        yield Button("Add", id="add_button")
+
+
+            # You have to add it into the box of the add and ohter things
+        with Collapsible():
+            with Vertical(id = "collapsible_content"):
+                yield Button("Remove Selected Stations", id="remove_button")
+                for i in range(len(urls)):
+                    yield Checkbox(f"{urls[i]['name']}", value=False, id=f"chk{i}")
                 
+                
+            
+            
         yield Footer()
 
     def on_mount(self) -> None:
@@ -105,7 +116,8 @@ class RadioPlayerApp(App):
 
     def on_radio_set_changed(self, event):
         self.radio.stop()
-        self.current_song = urls[0]["url"]
+        selected_index = int(event.radio_set.pressed_index)
+        self.current_song = urls[selected_index]["url"]
         self.radio.play(self.current_song)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -120,6 +132,39 @@ class RadioPlayerApp(App):
 
         elif button_id == "add_button":
             if len(self.query_one("#name_input").value) > 0 and len(self.query_one("#url_input").value) > 0:
+                new_name = self.query_one("#name_input").value
+                new_url = self.query_one("#url_input").value
+                urls.append({"name": new_name, "url": new_url})
+                with open(urls_file, "w") as f:
+                    json.dump(urls, f, indent=4)
+                radio_set = self.query_one("#radio_set")
+                radio_set.mount(RadioButton(new_name, id="op" + str(len(urls)-1)))
+                collapese = self.query_one("#collapsible_content")
+                collapese.mount(Checkbox(f"{new_name}", value=False, id=f"chk{len(urls)-1}"))
+                self.query_one("#name_input").value = ""
+                self.query_one("#url_input").value = ""
+        elif button_id == "remove_button":
+    # determine which checkboxes are checked
+            indices_to_remove = []
+            for i in range(len(urls)):
+                radio_stations_to_remove = self.query_one(f"#op{i}")
+                list_to_remove = self.query_one(f"#chk{i}")
+                list_to_remove.remove()
+                radio_stations_to_remove.remove()
+            for i in range(len(urls)):
+                chk = self.query_one(f"#chk{i}")
+                if chk.value:                     # remove CHECKED ones
+                    indices_to_remove.append(i)
+
+            # remove from data model
+            for idx in sorted(indices_to_remove, reverse=True):
+                del urls[idx]
+
+            # write updated json
+            with open(urls_file, "w") as f:
+                json.dump(urls, f, indent=4)
+
+            for i in range(len(urls)):
                 pass
 class RadioPlayer:
     def __init__(self):
