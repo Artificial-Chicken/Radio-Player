@@ -2,20 +2,27 @@ from mpv import MPV
 import os
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, Container, Center
-from textual.widgets import Label, RadioSet, RadioButton, Footer, Sparkline, Button
+from textual.widgets import Label, RadioSet, RadioButton, Footer, Sparkline, Button, Input
 import time
 import threading
 import random
 import math 
 from textual_slider import Slider
+import json
 
-urls = [
-    'https://www.youtube.com/watch?v=jfKfPfyJRdk',  # Lofi Hip Hop
-    'https://www.youtube.com/watch?v=E_XmwjgRLz8',  # Lofi Guitar
-    'https://www.youtube.com/watch?v=sulgD9TQsTk',   # Lofi Christmas
-]
 
-data = []
+import json
+data =[]
+
+import json
+
+with open("urls.json", "r") as f:
+    urls = json.load(f)
+
+# items is now a list of dicts
+
+
+print(urls)
 
 class RadioPlayerApp(App):
 
@@ -45,9 +52,11 @@ class RadioPlayerApp(App):
                 with Vertical(classes="box"):
                     yield Label("STATION", classes="box-label")
                     with RadioSet(id="radio_set"):
-                        yield RadioButton("Lofi Hip Hop", id="op0")
-                        yield RadioButton("Lofi Guitar", id="op1")
-                        yield RadioButton("Lofi Christmas", id="op2")
+                        for i in range(len(urls)):
+                            yield RadioButton(urls[i]["name"],id = "op" + str(i) )
+                            
+
+                        
 
                 # Right Box: Sparkline
                 with Vertical(classes="box"):
@@ -74,6 +83,12 @@ class RadioPlayerApp(App):
                     with Center():
                         yield Button("||", id="pause_button")
 
+            # Row 3: Add playlist items
+            with Horizontal(classes="row"):
+                yield Button("Add", id= "add_button")
+                yield Input(id="name_input", placeholder="Enter station name here")
+                yield Input(id="url_input", placeholder="Enter stream URL here")
+                
         yield Footer()
 
     def on_mount(self) -> None:
@@ -90,8 +105,8 @@ class RadioPlayerApp(App):
 
     def on_radio_set_changed(self, event):
         self.radio.stop()
-        self.current_song = int(event.pressed.id[-1])
-        self.radio.play(urls[self.current_song])
+        self.current_song = urls[0]["url"]
+        self.radio.play(self.current_song)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
@@ -103,6 +118,9 @@ class RadioPlayerApp(App):
                 self.radio.player.pause = True
                 event.button.label = "▶"
 
+        elif button_id == "add_button":
+            if len(self.query_one("#name_input").value) > 0 and len(self.query_one("#url_input").value) > 0:
+                pass
 class RadioPlayer:
     def __init__(self):
         self.player = MPV(ytdl=True, vo='null', volume=50)
