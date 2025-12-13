@@ -1,5 +1,6 @@
 from mpv import MPV
 import os
+import sys
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, Container, Center
 from textual.widgets import Label, RadioSet, RadioButton, Footer, Sparkline, Button, Input, Collapsible, Checkbox
@@ -12,7 +13,17 @@ import json
 
 data = []
 
-urls_file = os.path.join(os.path.dirname(__file__), "urls.json")
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        # Not running in a bundle
+        base_path = os.path.abspath(os.path.dirname(__file__))
+    return os.path.join(base_path, relative_path)
+
+urls_file = resource_path("urls.json")
 with open(urls_file, "r") as f:
     urls = json.load(f)
 # writes json to global variable "urls"
@@ -30,7 +41,7 @@ class RadioPlayerApp(App):
     def compose(self) -> ComposeResult:
         
         try:
-            ascii_art = open(os.path.join(os.path.dirname(__file__), "radioplayer_ascii.txt"), "r").read()  #reads ascii for title
+            ascii_art = open(resource_path("radioplayer_ascii.txt"), "r").read()  #reads ascii for title
         except FileNotFoundError:
             ascii_art = "RADIO PLAYER"
 
