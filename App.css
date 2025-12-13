@@ -135,3 +135,23 @@ Footer {
     align: center middle;
     margin-top: 1;
 }
+
+/* --- MANAGE STATIONS BOX --- */
+#manage_stations_box {
+    height: auto;
+    padding: 1;
+}
+
+Collapsible {
+    width: 100%;
+    height: auto;
+}
+
+Collapsible > .collapsible--title {
+    background: $bg-color;
+    color: $neon-blue;
+    border: none;
+    width: 100%;
+    text-style: bold;
+    content-align: center middle;
+}
