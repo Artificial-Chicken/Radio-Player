@@ -13,5 +13,5 @@ A terminal-based internet radio player built with Python and the Textual framewo
 
 ### 1. Clone the repository
 ```bash
-git clone [https://github.com/ArtificalChicken/Radio-Player.git](https://github.com/ArtificalChicken/Radio-Player.git)
+git clone https://github.com/Artificial-Chicken/Radio-Player
 cd Radio-Player
