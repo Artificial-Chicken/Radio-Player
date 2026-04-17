@@ -1,4 +1,4 @@
-
+## This Project is not maintained!
 # Radio Player
 
 A terminal-based internet radio player built with Python and the Textual framework. It features a custom CSS-styled interface for streaming radio directly from your command line.
